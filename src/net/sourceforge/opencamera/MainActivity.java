@@ -6,6 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.hardware.Camera;
@@ -28,26 +39,15 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Images.ImageColumns;
 import android.provider.MediaStore.Video;
 import android.provider.MediaStore.Video.VideoColumns;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -59,6 +59,7 @@ class MyDebug {
 	static final boolean LOG = false;
 }
 
+//メインアクティビティ
 public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 	private SensorManager mSensorManager = null;
@@ -144,7 +145,7 @@ public class MainActivity extends Activity {
 
 		preview = new Preview(this, savedInstanceState);
 		((ViewGroup) findViewById(R.id.preview)).addView(preview);
-		
+
         orientationEventListener = new OrientationEventListener(this) {
 			@Override
 			public void onOrientationChanged(int orientation) {
@@ -165,7 +166,7 @@ public class MainActivity extends Activity {
 			editor.putBoolean(done_first_time_key, true);
 			editor.apply();
         }
-        
+
 		if( MyDebug.LOG )
 			Log.d(TAG, "time for Activity startup: " + (System.currentTimeMillis() - time_s));
 	}
@@ -177,7 +178,7 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	public boolean onKeyDown(int keyCode, KeyEvent event) { 
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if( MyDebug.LOG )
 			Log.d(TAG, "onKeyDown: " + keyCode);
         if( keyCode == KeyEvent.KEYCODE_MENU ) {
@@ -188,7 +189,7 @@ public class MainActivity extends Activity {
         	clickedSettings(view);
             return true;
         }
-        return super.onKeyDown(keyCode, event); 
+        return super.onKeyDown(keyCode, event);
     }
 
 	private SensorEventListener accelerometerListener = new SensorEventListener() {
@@ -201,7 +202,7 @@ public class MainActivity extends Activity {
 			preview.onAccelerometerSensorChanged(event);
 		}
 	};
-	
+
 	private SensorEventListener magneticListener = new SensorEventListener() {
 		@Override
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -212,7 +213,7 @@ public class MainActivity extends Activity {
 			preview.onMagneticSensorChanged(event);
 		}
 	};
-	
+
     @Override
     protected void onResume() {
 		if( MyDebug.LOG )
@@ -230,7 +231,7 @@ public class MainActivity extends Activity {
 			else {
 		        layout.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
 			}
-	        getWindow().setAttributes(layout); 
+	        getWindow().setAttributes(layout);
 		}
 
         mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -256,7 +257,7 @@ public class MainActivity extends Activity {
 			    public void onProviderDisabled(String provider) {
 			    }
 			};
-			
+
 			// see https://sourceforge.net/p/opencamera/tickets/1/
 			if( mLocationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER) ) {
 				mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
@@ -296,7 +297,7 @@ public class MainActivity extends Activity {
 		boolean ui_placement_right = ui_placement.equals("ui_right");
 		if( MyDebug.LOG )
 			Log.d(TAG, "ui_placement: " + ui_placement);
-		// new code for orientation fixed to landscape	
+		// new code for orientation fixed to landscape
 		// the display orientation should be locked to landscape, but how many degrees is that?
 	    int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
 	    int degrees = 0;
@@ -575,7 +576,7 @@ public class MainActivity extends Activity {
 			layoutParams.addRule(below, 0);
 			view.setLayoutParams(layoutParams);
 		}
-		
+
 		{
 			// set seekbar info
 			View view = findViewById(R.id.seekbar);
@@ -618,7 +619,7 @@ public class MainActivity extends Activity {
 				view.setTranslationY(0);
 			}
 		}
-		
+
 		{
 			// set icon for taking photos vs videos
 			ImageButton view = (ImageButton)findViewById(R.id.take_photo);
@@ -676,7 +677,7 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "clickedFlash");
     	this.preview.cycleFlash();
     }
-    
+
     public void clickedFocusMode(View view) {
 		if( MyDebug.LOG )
 			Log.d(TAG, "clickedFocusMode");
@@ -689,14 +690,14 @@ public class MainActivity extends Activity {
 		view = findViewById(R.id.seekbar_zoom);
 		view.setVisibility(View.GONE);
     }
-    
+
     void setSeekBarExposure() {
 		SeekBar seek_bar = ((SeekBar)findViewById(R.id.seekbar));
 		final int min_exposure = preview.getMinimumExposure();
 		seek_bar.setMax( preview.getMaximumExposure() - min_exposure );
 		seek_bar.setProgress( preview.getCurrentExposure() - min_exposure );
     }
-    
+
     public void clickedExposure(View view) {
 		if( MyDebug.LOG )
 			Log.d(TAG, "clickedExposure");
@@ -741,7 +742,7 @@ public class MainActivity extends Activity {
 			clearSeekBar();
 		}
     }
-    
+
     public void clickedExposureLock(View view) {
 		if( MyDebug.LOG )
 			Log.d(TAG, "clickedExposureLock");
@@ -782,7 +783,7 @@ public class MainActivity extends Activity {
 			intent.putExtra("preview_widths", widths);
 			intent.putExtra("preview_heights", heights);
 		}
-		
+
 		List<Camera.Size> sizes = this.preview.getSupportedPictureSizes();
 		if( sizes != null ) {
 			int [] widths = new int[sizes.size()];
@@ -796,7 +797,7 @@ public class MainActivity extends Activity {
 			intent.putExtra("resolution_widths", widths);
 			intent.putExtra("resolution_heights", heights);
 		}
-		
+
 		List<String> video_quality = this.preview.getSupportedVideoQuality();
 		if( video_quality != null ) {
 			String [] video_quality_arr = new String[video_quality.size()];
@@ -824,13 +825,13 @@ public class MainActivity extends Activity {
 			intent.putExtra("video_widths", widths);
 			intent.putExtra("video_heights", heights);
 		}
-		
+
 		putIntentExtra(intent, "flash_values", this.preview.getSupportedFlashValues());
 		putIntentExtra(intent, "focus_values", this.preview.getSupportedFocusValues());
 
 		this.startActivity(intent);
     }
-    
+
     class Media {
     	public long id;
     	public boolean video;
@@ -846,7 +847,7 @@ public class MainActivity extends Activity {
     		this.orientation = orientation;
     	}
     }
-    
+
     private Media getLatestMedia(boolean video) {
     	Media media = null;
 		Uri baseUri = video ? Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -874,7 +875,7 @@ public class MainActivity extends Activity {
 		}
 		return media;
     }
-    
+
     private Media getLatestMedia() {
 		Media image_media = getLatestMedia(false);
 		Media video_media = getLatestMedia(true);
@@ -925,7 +926,7 @@ public class MainActivity extends Activity {
 		galleryButton.setPadding(left, top, right, bottom);
 		gallery_bitmap = null;
     }
-    
+
     public void updateGalleryIconToBitmap(Bitmap bitmap) {
 		if( MyDebug.LOG )
 			Log.d(TAG, "updateGalleryIconToBitmap");
@@ -933,7 +934,7 @@ public class MainActivity extends Activity {
 		galleryButton.setImageBitmap(bitmap);
 		gallery_bitmap = bitmap;
     }
-    
+
     public void updateGalleryIcon() {
 		if( MyDebug.LOG )
 			Log.d(TAG, "updateGalleryIcon");
@@ -981,7 +982,7 @@ public class MainActivity extends Activity {
 		if( MyDebug.LOG )
 			Log.d(TAG, "time to update gallery icon: " + (System.currentTimeMillis() - time_s));
     }
-    
+
     public void clickedGallery(View view) {
 		if( MyDebug.LOG )
 			Log.d(TAG, "clickedGallery");
@@ -1147,7 +1148,7 @@ public class MainActivity extends Activity {
     		);
     	}
 	}
-    
+
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
 
@@ -1214,14 +1215,14 @@ public class MainActivity extends Activity {
             }
             index = "_" + count; // try to find a unique filename
         }
-        
+
 
 		if( MyDebug.LOG ) {
 			Log.d(TAG, "getOutputMediaFile returns: " + mediaFile);
 		}
         return mediaFile;
     }
-    
+
     public boolean supportsAutoStabilise() {
     	return this.supports_auto_stabilise;
     }
@@ -1249,7 +1250,7 @@ public class MainActivity extends Activity {
     		return -1;
     	}
     }
-    
+
     public static String getDonateLink() {
     	return "https://play.google.com/store/apps/details?id=harman.mark.donation";
     }
