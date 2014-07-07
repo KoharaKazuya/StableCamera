@@ -4,5 +4,7 @@ _other/
 
 bin/
 gfx/
+gen/
 
 *.db
+
