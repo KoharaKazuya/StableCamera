@@ -4189,6 +4189,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     		if (camera != null && this.phase == PHASE_STABLE) {
             	Log.d("Shutter", String.valueOf(acc));
             	this.phase = PHASE_NORMAL;
+            	takePicture();
     		}
         }
 	}
