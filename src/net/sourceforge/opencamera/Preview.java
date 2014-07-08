@@ -4172,6 +4172,11 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
             this.acceleration[i] = event.values[i] - gravity[i];
         }
         Log.d("Acceleration", "(" + acceleration[0] + ", " + acceleration[1] + ", " + acceleration[2] + ")");
+        // "ぶれ"の指標
+        float acc = acceleration[0]*acceleration[0] + acceleration[1]*acceleration[1] + acceleration[2]*acceleration[2];
+        Log.d("acc", String.valueOf(acc));
+        if( acc < 0.01 )
+        	Log.d("Shutter", String.valueOf(acc));
 	}
 
     void onMagneticSensorChanged(SensorEvent event) {
