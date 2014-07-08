@@ -218,6 +218,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     private float [] gravity = new float[3];
     private boolean has_geomagnetic = false;
     private float [] geomagnetic = new float[3];
+    private float [] acceleration = new float[3];
     private float [] deviceRotation = new float[9];
     private float [] cameraRotation = new float[9];
     private float [] deviceInclination = new float[9];
@@ -4165,6 +4166,12 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		this.invalidate();
+
+		// 重力を除いた加速度の取得
+        for(int i=0;i<3;i++) {
+            this.acceleration[i] = event.values[i] - gravity[i];
+        }
+        Log.d("Acceleration", "(" + acceleration[0] + ", " + acceleration[1] + ", " + acceleration[2] + ")");
 	}
 
     void onMagneticSensorChanged(SensorEvent event) {
