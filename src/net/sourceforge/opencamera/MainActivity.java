@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import net.sourceforge.opencamera.temp.GyroSensorViewUpdater;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -1334,6 +1335,7 @@ public class MainActivity extends Activity {
     	view = findViewById(R.id.acceleratorZ);
     	view.setRotation(ui_rotation);
 
+    	/*
     	//ジャイロ
     	//x軸
     	view = findViewById(R.id.gyroX);
@@ -1346,5 +1348,6 @@ public class MainActivity extends Activity {
     	//z軸
     	view = findViewById(R.id.gyroZ);
     	view.setRotation(ui_rotation);
+    	*/
     }
 }

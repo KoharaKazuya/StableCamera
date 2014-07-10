@@ -54,6 +54,7 @@
             android:background="@drawable/acceleratorbox"
             android:text="1"/>
 
+        <!--
         <TextView
             android:id="@+id/gyroX"
             android:layout_width="50dp"
@@ -86,6 +87,7 @@
             android:layout_margin="2dp"
             android:textColor="#FFFFFF"
             android:background="@drawable/acceleratorbox"/>
+		-->
 
     </LinearLayout>
 
