@@ -15,6 +15,11 @@ class Accelerometer {
 	protected List<Sensor> sensorList = null;
 	protected SensorEventListener sensorListener = null;
 
+	protected float ALPHA = 0.8f;
+
+	//重力x, y , z
+	protected float[] gravity = new float[3];
+
 	//各方向への加速度 (m / s^2)
 	protected double accelerationX;
 	protected double accelerationY;
@@ -29,9 +34,10 @@ class Accelerometer {
 
 			//センサが変化した際の処理
 			public void onSensorChanged(SensorEvent event) {
-				accelerationX = event.values[0];
-				accelerationY = event.values[1];
-				accelerationZ = event.values[2];
+				updateGravity(event);
+				accelerationX = event.values[0] - gravity[0];
+				accelerationY = event.values[1] - gravity[1];
+				accelerationZ = event.values[2] - gravity[2];
 				performWhenSensorChanged();
 			}
 
@@ -79,4 +85,12 @@ class Accelerometer {
 	//センサ値が変化した際に呼ばれるメソッド
 	//基本的にはオーバーライドして使う
 	public void performWhenSensorChanged(){}
+
+
+	//重力値の更新
+	private void updateGravity(SensorEvent event) {
+		for (int i = 0; i < this.gravity.length; i++) {
+			this.gravity[i] = ALPHA * this.gravity[i] + (1.0f - ALPHA) * event.values[i];
+		}
+	}
 }

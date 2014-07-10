@@ -9,6 +9,7 @@ package net.sourceforge.opencamera;
 
 public final class R {
     public static final class array {
+        public static final int Modes=0x7f05001a;
         public static final int flash_entries=0x7f050001;
         public static final int flash_icons=0x7f050000;
         public static final int flash_values=0x7f050002;

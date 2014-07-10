@@ -31,9 +31,9 @@ public class SensorViewUpdater extends Accelerometer {
 		TextView acceleratorY = (TextView) this.parentActivity.findViewById(R.id.acceleratorY);
 		TextView acceleratorZ = (TextView) this.parentActivity.findViewById(R.id.acceleratorZ);
 
-		double x = this.getX();
-		double y = this.getY();
-		double z = this.getZ();
+		double x = Math.abs(this.getX());
+		double y = Math.abs(this.getY());
+		double z = Math.abs(this.getZ());
 
 		String xValue = "X\r\n" + decimalFormat.format(x);
 		String yValue = "Y\r\n" + decimalFormat.format(y);

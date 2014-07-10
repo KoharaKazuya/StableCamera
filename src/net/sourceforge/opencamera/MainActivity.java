@@ -71,6 +71,9 @@ public class MainActivity extends Activity {
 	private static final String NORMAL = "normal";
 	private static final String STABLE = "stable";
 
+	//撮影モード
+	private String mode = NORMAL;
+
 	//センサマネージャー
 	private SensorManager mSensorManager = null;
 
@@ -112,6 +115,9 @@ public class MainActivity extends Activity {
 		if( MyDebug.LOG ) {
 			Log.d(TAG, "onCreate");
 		}
+
+		//撮影モードをノーマルで初期化
+		this.mode = NORMAL;
 
 		//現在時刻の取得
     	long time_s = System.currentTimeMillis();
@@ -1350,4 +1356,10 @@ public class MainActivity extends Activity {
     	view.setRotation(ui_rotation);
     	*/
     }
+
+    //撮影モードの切り替え
+    private void changeMode() {
+    	this.mode = this.mode.equals(NORMAL) ? STABLE : NORMAL;
+    }
+
 }
