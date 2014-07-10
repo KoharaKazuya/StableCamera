@@ -61,44 +61,82 @@ class MyDebug {
 
 //メインアクティビティ
 public class MainActivity extends Activity {
+
+
+
 	private static final String TAG = "MainActivity";
+
+	//撮影モード
+	private static final String NORMAL = "normal";
+	private static final String STABLE = "stable";
+
+	//センサマネージャー
 	private SensorManager mSensorManager = null;
-	private Sensor mSensorAccelerometer = null;
+
+	//加速度センサ
+	//private Sensor mSensorAccelerometer = null;
+	private SensorViewUpdater accelerometerSensor = null;
+	private GyroSensorViewUpdater gyroSensor = null;
+
+	//磁気センサ
 	private Sensor mSensorMagnetic = null;
+
+	//ロケーションマネージャー
 	private LocationManager mLocationManager = null;
+
+	//ロケーションリスナー
 	private LocationListener locationListener = null;
+
 	private Preview preview = null;
+
+	//画面の向き
 	private int current_orientation = 0;
 	private OrientationEventListener orientationEventListener = null;
+
+
 	private boolean supports_auto_stabilise = false;
 	private boolean supports_force_video_4k = false;
+
+
 
 	// for testing:
 	public boolean is_test = false;
 	public Bitmap gallery_bitmap = null;
 
+
+	//アプリ起動時
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		if( MyDebug.LOG ) {
 			Log.d(TAG, "onCreate");
 		}
+
+		//現在時刻の取得
     	long time_s = System.currentTimeMillis();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		//XMLファイルからデフォルト値を読み込む(res/xml/preference.xml)
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+		//インテントから値(あれば)を取得
 		if( getIntent() != null && getIntent().getExtras() != null ) {
 			is_test = getIntent().getExtras().getBoolean("test_project");
 			if( MyDebug.LOG )
 				Log.d(TAG, "is_test: " + is_test);
 		}
+		//プリファレンスを取得
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+		//メモリ等を取得
 		ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 		if( MyDebug.LOG ) {
 			Log.d(TAG, "standard max memory = " + activityManager.getMemoryClass() + "MB");
 			Log.d(TAG, "large max memory = " + activityManager.getLargeMemoryClass() + "MB");
 		}
+
+		//メモリが128MBより大きければauto_stabiliseをONにする
 		//if( activityManager.getMemoryClass() >= 128 ) { // test
 		if( activityManager.getLargeMemoryClass() >= 128 ) {
 			supports_auto_stabilise = true;
@@ -115,14 +153,18 @@ public class MainActivity extends Activity {
 		if( MyDebug.LOG )
 			Log.d(TAG, "supports_force_video_4k? " + supports_force_video_4k);
 
-		// keep screen active - see http://stackoverflow.com/questions/2131948/force-screen-on
+		// スクリーンがオフにならないようにする
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        //センサマネージャーの取得
         mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 		if( mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null ) {
 			if( MyDebug.LOG )
 				Log.d(TAG, "found accelerometer");
-			mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			//加速度センサを取得
+			//mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			this.accelerometerSensor = new SensorViewUpdater(this);
+			this.gyroSensor = new GyroSensorViewUpdater(this);
 		}
 		else {
 			if( MyDebug.LOG )
@@ -131,6 +173,7 @@ public class MainActivity extends Activity {
 		if( mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null ) {
 			if( MyDebug.LOG )
 				Log.d(TAG, "found magnetic sensor");
+			//磁気センサを取得
 			mSensorMagnetic = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 		}
 		else {
@@ -138,10 +181,15 @@ public class MainActivity extends Activity {
 				Log.d(TAG, "no support for magnetic sensor");
 		}
 
+		//ロケーションマネージャーを取得
 		mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 
+		//ギャラリーの更新
 		updateGalleryIcon();
+
+		//多分シークバーの初期化
 		clearSeekBar();
+
 
 		preview = new Preview(this, savedInstanceState);
 		((ViewGroup) findViewById(R.id.preview)).addView(preview);
@@ -234,7 +282,9 @@ public class MainActivity extends Activity {
 	        getWindow().setAttributes(layout);
 		}
 
-        mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		this.accelerometerSensor.setListener();
+		this.gyroSensor.setListener();
+        //mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(magneticListener, mSensorMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
         orientationEventListener.enable();
 
@@ -280,7 +330,9 @@ public class MainActivity extends Activity {
 		if( MyDebug.LOG )
 			Log.d(TAG, "onPause");
         super.onPause();
-        mSensorManager.unregisterListener(accelerometerListener);
+        //mSensorManager.unregisterListener(accelerometerListener);
+        this.accelerometerSensor.unsetListener();
+        this.gyroSensor.unsetListener();
         mSensorManager.unregisterListener(magneticListener);
         orientationEventListener.disable();
         if( this.locationListener != null ) {
@@ -456,6 +508,8 @@ public class MainActivity extends Activity {
 			layoutParams.addRule(above, R.id.zoom);
 			layoutParams.addRule(below, 0);
 			view.setLayoutParams(layoutParams);
+
+			this.rotateSensorValues(ui_rotation);
 		}
 		else {
 			View view = findViewById(R.id.switch_camera);
@@ -575,6 +629,7 @@ public class MainActivity extends Activity {
 			layoutParams.addRule(above, R.id.zoom);
 			layoutParams.addRule(below, 0);
 			view.setLayoutParams(layoutParams);
+
 		}
 
 		{
@@ -1262,5 +1317,34 @@ public class MainActivity extends Activity {
     // for testing:
     public Preview getPreview() {
     	return this.preview;
+    }
+
+    //センサ値の表示を回転させる
+    private void rotateSensorValues(int ui_rotation) {
+
+    	//x軸
+    	View view = findViewById(R.id.acceleratorX);
+    	view.setRotation(ui_rotation);
+
+    	//y軸
+    	view = findViewById(R.id.acceleratorY);
+    	view.setRotation(ui_rotation);
+
+    	//z軸
+    	view = findViewById(R.id.acceleratorZ);
+    	view.setRotation(ui_rotation);
+
+    	//ジャイロ
+    	//x軸
+    	view = findViewById(R.id.gyroX);
+    	view.setRotation(ui_rotation);
+
+    	//y軸
+    	view = findViewById(R.id.gyroY);
+    	view.setRotation(ui_rotation);
+
+    	//z軸
+    	view = findViewById(R.id.gyroZ);
+    	view.setRotation(ui_rotation);
     }
 }

@@ -8,30 +8,27 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
-//加速度センサの値を扱うためのクラス
-class Accelerometer {
+public class GyroSensor {
 
 	protected SensorManager sensor = null;
-	protected List<Sensor> sensorList = null;
+	protected List<Sensor> sensorList =null;
 	protected SensorEventListener sensorListener = null;
 
-	//各方向への加速度 (m / s^2)
-	protected double accelerationX;
-	protected double accelerationY;
-	protected double accelerationZ;
+	//各方向への加速度
+	protected double gyroX;
+	protected double gyroY;
+	protected double gyroZ;
 
-	//コンストラクタ
-	public Accelerometer(Context context){
+	public GyroSensor(Context context) {
 		this.sensor = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-		this.sensorList = this.sensor.getSensorList(Sensor.TYPE_ACCELEROMETER);
-
+		this.sensorList = this.sensor.getSensorList(Sensor.TYPE_GYROSCOPE);
 		this.sensorListener = new SensorEventListener() {
 
-			//センサが変化した際の処理
+			//センサ値が変化した際の処理
 			public void onSensorChanged(SensorEvent event) {
-				accelerationX = event.values[0];
-				accelerationY = event.values[1];
-				accelerationZ = event.values[2];
+				gyroX = event.values[0];
+				gyroY = event.values[1];
+				gyroZ = event.values[2];
 				performWhenSensorChanged();
 			}
 
@@ -39,44 +36,32 @@ class Accelerometer {
 		};
 	}
 
-
-
-	/**
-	 * X軸方向の加速度を取得
-	 */
-	public double getX() {
-		return this.accelerationX;
+	public double getGyroX() {
+		return this.gyroX;
 	}
 
-	/**
-	 * y軸方向の加速度を取得
-	 */
-	public double getY() {
-		return this.accelerationY;
+	public double getGyroY() {
+		return this.gyroY;
 	}
 
-	/**
-	 * z軸方向の加速度を取得
-	 */
-	public double getZ() {
-		return this.accelerationZ;
+	public double getGyroZ() {
+		return this.gyroZ;
 	}
 
-	//リスナーを登録
 	public void setListener() {
 		if (this.sensorList.size() > 0) {
 			this.sensor.registerListener(this.sensorListener, this.sensorList.get(0), SensorManager.SENSOR_DELAY_NORMAL);
 		}
 	}
 
-	//リスナーを解除
 	public void unsetListener() {
 		if (this.sensorList.size() > 0) {
 			this.sensor.unregisterListener(this.sensorListener, this.sensorList.get(0));
 		}
 	}
 
-	//センサ値が変化した際に呼ばれるメソッド
-	//基本的にはオーバーライドして使う
+	//基本的にオーバーライドして使う
 	public void performWhenSensorChanged(){}
+
+
 }

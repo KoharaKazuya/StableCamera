@@ -2,19 +2,21 @@ package net.sourceforge.opencamera;
 
 //onResumeでインスタンス化すること
 
-import android.content.Context;
-import android.view.View;
+import java.text.DecimalFormat;
+
+import android.app.Activity;
 import android.widget.TextView;
 
 public class SensorViewUpdater extends Accelerometer {
 
-	private View parent = null;
+	private Activity parentActivity;
+	private DecimalFormat decimalFormat = new DecimalFormat("#0.0");
 
 	//コンストラクタ
 	//ここでセンサ値をセットしたいビューを引数で渡す
-	SensorViewUpdater(Context context, View parent) {
-		super(context);
-		this.parent = parent;
+	SensorViewUpdater(Activity parent) {
+		super(parent.getApplicationContext());
+		this.parentActivity = parent;
 	}
 
 	@Override
@@ -25,17 +27,21 @@ public class SensorViewUpdater extends Accelerometer {
 	//Sensor値の更新
 	private void updateSensorValues() {
 
-		TextView acceleratorX = (TextView) parent.findViewById(R.id.acceleratorX);
-		TextView acceleratorY = (TextView) parent.findViewById(R.id.acceleratorY);
-		TextView acceleratorZ = (TextView) parent.findViewById(R.id.acceleratorZ);
+		TextView acceleratorX = (TextView) this.parentActivity.findViewById(R.id.acceleratorX);
+		TextView acceleratorY = (TextView) this.parentActivity.findViewById(R.id.acceleratorY);
+		TextView acceleratorZ = (TextView) this.parentActivity.findViewById(R.id.acceleratorZ);
 
 		double x = this.getX();
 		double y = this.getY();
 		double z = this.getZ();
 
-		acceleratorX.setText(Double.toString(x));
-		acceleratorY.setText(Double.toString(y));
-		acceleratorZ.setText(Double.toString(z));
+		String xValue = "X\r\n" + decimalFormat.format(x);
+		String yValue = "Y\r\n" + decimalFormat.format(y);
+		String zValue = "Z\r\n" + decimalFormat.format(z);
+
+		acceleratorX.setText(xValue);
+		acceleratorY.setText(yValue);
+		acceleratorZ.setText(zValue);
 	}
 
 }
