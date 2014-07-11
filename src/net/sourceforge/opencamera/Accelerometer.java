@@ -11,6 +11,9 @@ import android.hardware.SensorManager;
 //加速度センサの値を扱うためのクラス
 class Accelerometer {
 
+	protected float[] gravity = new float[3];
+	protected static final float ALPHA = 0.6f;
+
 	protected SensorManager sensor = null;
 	protected List<Sensor> sensorList = null;
 	protected SensorEventListener sensorListener = null;
@@ -29,9 +32,14 @@ class Accelerometer {
 
 			//センサが変化した際の処理
 			public void onSensorChanged(SensorEvent event) {
-				accelerationX = event.values[0];
-				accelerationY = event.values[1];
-				accelerationZ = event.values[2];
+
+				for (int i = 0; i< gravity.length; i++) {
+					gravity[i] = ALPHA * gravity[i] + (1.0f - ALPHA) * event.values[i];
+				}
+
+				accelerationX = event.values[0] - gravity[0];
+				accelerationY = event.values[1] - gravity[1];
+				accelerationZ = event.values[2] - gravity[2];
 				performWhenSensorChanged();
 			}
 

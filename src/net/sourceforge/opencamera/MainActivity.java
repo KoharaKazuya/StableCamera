@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import net.sourceforge.opencamera.temp.GyroSensorViewUpdater;
@@ -17,9 +18,14 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -41,6 +47,7 @@ import android.provider.MediaStore.Images.ImageColumns;
 import android.provider.MediaStore.Video;
 import android.provider.MediaStore.Video.VideoColumns;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.OrientationEventListener;
@@ -54,6 +61,9 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 import android.widget.ZoomControls;
 
 class MyDebug {
@@ -66,10 +76,16 @@ public class MainActivity extends Activity {
 
 
 	private static final String TAG = "MainActivity";
+	private static final String MODEKEY = "mode";
 
 	//撮影モード
-	private static final String NORMAL = "normal";
-	private static final String STABLE = "stable";
+	private static final String NORMAL = "NormalShutterMode";
+	private static final String STABLE = "StableShutterMode";
+
+	private String mode = NORMAL;
+	private HashMap<String, Integer> modeImageIDPairs = null;
+
+	private int rotation = 0;
 
 	//センサマネージャー
 	private SensorManager mSensorManager = null;
@@ -117,6 +133,11 @@ public class MainActivity extends Activity {
     	long time_s = System.currentTimeMillis();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		//モードとそれに対応する画像IDのペアを保存
+		this.modeImageIDPairs = new HashMap<String, Integer>();
+		this.modeImageIDPairs.put(NORMAL, R.drawable.normal);
+		this.modeImageIDPairs.put(STABLE, R.drawable.stable);
 
 		//XMLファイルからデフォルト値を読み込む(res/xml/preference.xml)
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -218,6 +239,62 @@ public class MainActivity extends Activity {
 
 		if( MyDebug.LOG )
 			Log.d(TAG, "time for Activity startup: " + (System.currentTimeMillis() - time_s));
+
+		//撮影モードの初期化
+		this.modeInitialize();
+
+		//モード切替処理の登録
+		ImageButton modeButton = (ImageButton)findViewById(R.id.modeButton);
+		modeButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+
+				mode = mode.equals(NORMAL) ? STABLE : NORMAL;
+
+				ImageButton modeButton = (ImageButton)view;
+				modeButton.setImageResource(modeImageIDPairs.get(mode));
+
+				Context context = getApplicationContext();
+				SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
+				Editor editor = preference.edit();
+				editor.putString(MODEKEY, mode);
+				editor.commit();
+
+				ToastBoxer toast = new ToastBoxer();
+				showToast(toast, mode);
+			}
+		});
+
+//		Spinner spinner = (Spinner)findViewById(R.id.modeSpinner);
+//		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+//
+//			//アイテムが選択された場合の処理
+//			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//				Spinner spinner = (Spinner)parent;
+//				String selectedItem = spinner.getSelectedItem().toString();
+//
+//				if (!mode.equals(selectedItem)) {
+//
+//					//モードをプリファレンスに保存
+//					Context context = getApplicationContext();
+//					SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
+//					Editor editor = preference.edit();
+//					editor.putString(MODEKEY, selectedItem);
+//					editor.commit();
+//
+//					//モードを変更
+//					mode = selectedItem;
+//
+//					//変更後のモードをトーストで表示
+//					Toast.makeText(context, mode, Toast.LENGTH_SHORT).show();
+//				}
+//			}
+//
+//			//項目が選択されなかった場合の処理
+//			public void onNothingSelected(AdapterView<?> parent) {}
+//		});
+
+
+
 	}
 
 	@Override
@@ -370,6 +447,7 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "    relative_orientation = " + relative_orientation);
 		}
 		int ui_rotation = (360 - relative_orientation) % 360;
+		this.rotation = ui_rotation;
 		preview.setUIRotation(ui_rotation);
 		int align_left = RelativeLayout.ALIGN_LEFT;
 		int align_right = RelativeLayout.ALIGN_RIGHT;
@@ -510,7 +588,11 @@ public class MainActivity extends Activity {
 			layoutParams.addRule(below, 0);
 			view.setLayoutParams(layoutParams);
 
+			view = findViewById(R.id.modeButton);
+			view.setRotation(ui_rotation);
+
 			this.rotateSensorValues(ui_rotation);
+			//this.rotateModeSpinner();
 		}
 		else {
 			View view = findViewById(R.id.switch_camera);
@@ -1350,4 +1432,131 @@ public class MainActivity extends Activity {
     	view.setRotation(ui_rotation);
     	*/
     }
+
+//    private void rotateModeSpinner() {
+//
+//
+//    	int num = 0;
+//    	Spinner spinner = (Spinner)findViewById(R.id.modeSpinner);
+//    	spinner.setRotation(270.0f);
+//    	num = spinner.getAdapter().getCount();
+//    	Log.i("Camera", Integer.toString(num));
+//    	for (int i = 0; i < num; i++) {
+//    		View child = spinner.
+//    		child.setRotation(270.0f);
+//    	}
+//
+//    }
+
+    //プリファレンスに保存されている値にモードをイニシャライズする．
+    private void modeInitialize() {
+    	Context context = getApplicationContext();
+    	SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
+    	String modeInPreference = preference.getString(MODEKEY, NORMAL);
+    	this.mode = modeInPreference;
+
+    	ImageButton modeButton = (ImageButton)findViewById(R.id.modeButton);
+    	modeButton.setImageResource(this.modeImageIDPairs.get(this.mode));
+//    	Spinner spinner = (Spinner)findViewById(R.id.modeSpinner);
+//    	int position = getSpinnerPosByItem(spinner, this.mode);
+//    	spinner.setSelection(position);
+    }
+
+    //アイテム名からポジションを取得する．
+    private int getSpinnerPosByItem(Spinner spinner, String item) {
+    	SpinnerAdapter adapter = spinner.getAdapter();
+    	int elementNum = adapter.getCount();
+
+    	int pos = 0;
+    	for (int i = 0; i < elementNum; i++) {
+    		if (item.equals(spinner.getItemAtPosition(i))) {
+    			System.out.println(i);
+    			pos = i;
+    			break;
+    		}
+    	}
+
+    	return pos;
+    }
+
+
+    public void showToast(final ToastBoxer clear_toast, final String message) {
+
+    	class RotatedTextView extends View {
+			private String text = "";
+			private Paint paint = new Paint();
+			private Rect bounds = new Rect();
+			private Rect rect = new Rect();
+
+			public RotatedTextView(String text, Context context) {
+				super(context);
+
+				this.text = text;
+			}
+
+			@Override
+			protected void onDraw(Canvas canvas) {
+				final float scale = getResources().getDisplayMetrics().density;
+				paint.setTextSize(14 * scale + 0.5f); // convert dps to pixels
+				paint.setShadowLayer(1, 0, 1, Color.BLACK);
+				paint.getTextBounds(text, 0, text.length(), bounds);
+				/*if( MyDebug.LOG ) {
+					Log.d(TAG, "bounds: " + bounds);
+				}*/
+				final int padding = (int) (14 * scale + 0.5f); // convert dps to pixels
+				final int offset_y = (int) (32 * scale + 0.5f); // convert dps to pixels
+				canvas.save();
+				canvas.rotate(rotation, canvas.getWidth()/2, canvas.getHeight()/2);
+
+				rect.left = canvas.getWidth()/2 - bounds.width()/2 + bounds.left - padding;
+				rect.top = canvas.getHeight()/2 + bounds.top - padding + offset_y;
+				rect.right = canvas.getWidth()/2 - bounds.width()/2 + bounds.right + padding;
+				rect.bottom = canvas.getHeight()/2 + bounds.bottom + padding + offset_y;
+
+				paint.setStyle(Paint.Style.FILL);
+				paint.setColor(Color.rgb(75, 75, 75));
+				canvas.drawRect(rect.left, rect.top, rect.right, rect.bottom, paint);
+
+				paint.setStyle(Paint.Style.STROKE);
+				paint.setColor(Color.rgb(150, 150, 150));
+				canvas.drawLine(rect.left, rect.top, rect.right, rect.top, paint);
+				canvas.drawLine(rect.left, rect.top, rect.left, rect.bottom, paint);
+
+				paint.setStyle(Paint.Style.FILL); // needed for Android 4.4!
+				paint.setColor(Color.WHITE);
+				canvas.drawText(text, canvas.getWidth()/2 - bounds.width()/2, canvas.getHeight()/2 + offset_y, paint);
+				canvas.restore();
+			}
+		}
+
+		if( MyDebug.LOG )
+			Log.d(TAG, "showToast");
+		final Activity activity = this;
+		// We get a crash on emulator at least if Toast constructor isn't run on main thread (e.g., the toast for taking a photo when on timer).
+		// Also see http://stackoverflow.com/questions/13267239/toast-from-a-non-ui-thread
+		activity.runOnUiThread(new Runnable() {
+			public void run() {
+				if( clear_toast != null && clear_toast.toast != null )
+					clear_toast.toast.cancel();
+				/*clear_toast = Toast.makeText(activity.getApplicationContext(), message, Toast.LENGTH_SHORT);
+				clear_toast.show();*/
+
+				Toast toast = new Toast(activity);
+				if( clear_toast != null )
+					clear_toast.toast = toast;
+				View text = new RotatedTextView(message, activity);
+				toast.setView(text);
+				toast.setGravity(Gravity.CENTER, 0, 0);
+				toast.setDuration(Toast.LENGTH_SHORT);
+				toast.show();
+			}
+		});
+	}
+
+    class ToastBoxer {
+		public Toast toast = null;
+
+		ToastBoxer() {
+		}
+	}
 }

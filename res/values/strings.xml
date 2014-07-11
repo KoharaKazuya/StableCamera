@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="intro_text">Touch to focus, and press the blue camera button to take photos. For more help, click Online help from Settings. Open Camera is completely free. If you like this app, please consider buying my donate app :) (see link in Settings, or Online help).\n\nPrivacy Policy: Location permission is required for geotagging, but this is disabled by default. If enabled, your location is encoded in the saved files (and it is only used for this purpose).\n\n(This message won\'t show again.)</string>
     <string name="intro_ok">OK (This message won\'t show again)</string>
-    
+
     <string name="preference_category_camera_effects">Camera Effects</string>
     <string name="preference_auto_stabilise">Auto-stabilise</string>
     <string name="preference_auto_stabilise_summary">Images will be rotated so they are automatically level (photos only) (slower to take photos, and may fail on devices with too low memory)</string>
@@ -63,7 +63,7 @@
     <string name="preference_thumbnail_animation_summary">Display moving thumbnail animation when taking a photo</string>
     <string name="preference_max_brightness">Force maximum brightness</string>
     <string name="preference_max_brightness_summary">Force screen display to be at maximum brightness, rather than device default</string>
-    
+
     <string name="preference_category_camera_quality">Photo and Video Settings</string>
     <string name="preference_screen_camera_quality">Photo and video settings…</string>
     <string name="preference_resolution">Camera resolution</string>
@@ -84,7 +84,7 @@
     <string name="preference_record_audio_summary">Record audio when recording video</string>
     <string name="preference_record_audio_src">Audio source</string>
     <string name="preference_record_audio_src_summary">Microphone to use for recording audio</string>
-    
+
     <string name="preference_category_online">Misc</string>
     <string name="preference_online_help">Online help</string>
     <string name="preference_donate">Donate to support development</string>
@@ -95,7 +95,7 @@
     <string name="about_available">Available</string>
     <string name="about_not_available">Not available</string>
     <string name="about_copy_to_clipboard">Copy to clipboard</string>
-    
+
     <string name="take_photo">Take Photo</string>
     <string name="gallery">Gallery</string>
     <string name="exposure">Exposure</string>
@@ -106,5 +106,11 @@
     <string name="switch_video">Switch Video</string>
     <string name="trash">Delete Last Picture</string>
     <string name="share">Share Photo</string>
-    
+    <string name="mode_normal">NormalShutterMode</string>
+    <string name="mode_stable">StableShutterMode</string>
+    <string-array name="Models">
+        <item >StableMode</item>
+        <item >NormalMode</item>
+    </string-array>
+
 </resources>

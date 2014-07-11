@@ -9,6 +9,7 @@ package net.sourceforge.opencamera;
 
 public final class R {
     public static final class array {
+        public static final int Models=0x7f05001a;
         public static final int flash_entries=0x7f050001;
         public static final int flash_icons=0x7f050000;
         public static final int flash_values=0x7f050002;
@@ -68,36 +69,39 @@ public final class R {
         public static final int focus_mode_macro=0x7f020010;
         public static final int gallery=0x7f020011;
         public static final int ic_launcher=0x7f020012;
-        public static final int settings=0x7f020013;
-        public static final int share=0x7f020014;
-        public static final int switch_camera=0x7f020015;
-        public static final int switch_video=0x7f020016;
-        public static final int take_photo=0x7f020017;
-        public static final int take_video=0x7f020018;
-        public static final int trash=0x7f020019;
+        public static final int normal=0x7f020013;
+        public static final int settings=0x7f020014;
+        public static final int share=0x7f020015;
+        public static final int stable=0x7f020016;
+        public static final int switch_camera=0x7f020017;
+        public static final int switch_video=0x7f020018;
+        public static final int take_photo=0x7f020019;
+        public static final int take_video=0x7f02001a;
+        public static final int trash=0x7f02001b;
     }
     public static final class id {
-        public static final int acceleratorX=0x7f0a0002;
-        public static final int acceleratorY=0x7f0a0003;
-        public static final int acceleratorZ=0x7f0a0004;
-        public static final int action_settings=0x7f0a0014;
-        public static final int exposure=0x7f0a000b;
-        public static final int exposure_lock=0x7f0a000a;
-        public static final int flash=0x7f0a000d;
-        public static final int focus_mode=0x7f0a000c;
-        public static final int gallery=0x7f0a0009;
+        public static final int acceleratorX=0x7f0a0003;
+        public static final int acceleratorY=0x7f0a0004;
+        public static final int acceleratorZ=0x7f0a0005;
+        public static final int action_settings=0x7f0a0015;
+        public static final int exposure=0x7f0a000c;
+        public static final int exposure_lock=0x7f0a000b;
+        public static final int flash=0x7f0a000e;
+        public static final int focus_mode=0x7f0a000d;
+        public static final int gallery=0x7f0a000a;
+        public static final int modeButton=0x7f0a0001;
         public static final int preview=0x7f0a0000;
-        public static final int seekbar=0x7f0a0012;
-        public static final int seekbar_zoom=0x7f0a0013;
-        public static final int sensorValues=0x7f0a0001;
-        public static final int settings=0x7f0a0008;
-        public static final int share=0x7f0a0011;
-        public static final int switch_camera=0x7f0a000f;
-        public static final int switch_video=0x7f0a000e;
-        public static final int take_photo=0x7f0a0005;
-        public static final int trash=0x7f0a0010;
-        public static final int zoom=0x7f0a0006;
-        public static final int zoom_seekbar=0x7f0a0007;
+        public static final int seekbar=0x7f0a0013;
+        public static final int seekbar_zoom=0x7f0a0014;
+        public static final int sensorValues=0x7f0a0002;
+        public static final int settings=0x7f0a0009;
+        public static final int share=0x7f0a0012;
+        public static final int switch_camera=0x7f0a0010;
+        public static final int switch_video=0x7f0a000f;
+        public static final int take_photo=0x7f0a0006;
+        public static final int trash=0x7f0a0011;
+        public static final int zoom=0x7f0a0007;
+        public static final int zoom_seekbar=0x7f0a0008;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -119,6 +123,8 @@ public final class R {
         public static final int gallery=0x7f07005b;
         public static final int intro_ok=0x7f070003;
         public static final int intro_text=0x7f070002;
+        public static final int mode_normal=0x7f070064;
+        public static final int mode_stable=0x7f070065;
         public static final int preference_about=0x7f070054;
         public static final int preference_about_summary=0x7f070055;
         public static final int preference_auto_stabilise=0x7f070005;
