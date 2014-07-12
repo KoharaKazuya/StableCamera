@@ -3033,7 +3033,14 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		remaining_burst_photos = n_burst-1;
 		
 		if( timer_delay == 0 ) {
-			takePictureWhenStable();
+			Context context = getContext().getApplicationContext();
+			SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+			String mode = pref.getString(MainActivity.MODEKEY, MainActivity.NORMAL);
+			if (mode.equals(MainActivity.NORMAL)) {
+				takePicture();
+			} else if (mode.equals(MainActivity.STABLE)) {
+				takePictureWhenStable();
+			}
 		}
 		else {
 			takePictureOnTimer(timer_delay, false);

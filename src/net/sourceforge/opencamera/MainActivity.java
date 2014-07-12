@@ -76,11 +76,11 @@ public class MainActivity extends Activity {
 
 
 	private static final String TAG = "MainActivity";
-	private static final String MODEKEY = "mode";
+	public static final String MODEKEY = "mode";
 
 	//撮影モード
-	private static final String NORMAL = "NormalShutterMode";
-	private static final String STABLE = "StableShutterMode";
+	public static final String NORMAL = "NormalShutterMode";
+	public static final String STABLE = "StableShutterMode";
 
 	private String mode = NORMAL;
 	private HashMap<String, Integer> modeImageIDPairs = null;
