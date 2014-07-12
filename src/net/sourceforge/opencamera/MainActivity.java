@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
 	private SensorManager mSensorManager = null;
 
 	//加速度センサ
-	//private Sensor mSensorAccelerometer = null;
+	private Sensor mSensorAccelerometer = null;
 	private SensorViewUpdater accelerometerSensor = null;
 	private GyroSensorViewUpdater gyroSensor = null;
 
@@ -184,7 +184,7 @@ public class MainActivity extends Activity {
 			if( MyDebug.LOG )
 				Log.d(TAG, "found accelerometer");
 			//加速度センサを取得
-			//mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+			mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 			this.accelerometerSensor = new SensorViewUpdater(this);
 			this.gyroSensor = new GyroSensorViewUpdater(this);
 		}
@@ -362,7 +362,7 @@ public class MainActivity extends Activity {
 
 		this.accelerometerSensor.setListener();
 		this.gyroSensor.setListener();
-        //mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(magneticListener, mSensorMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
         orientationEventListener.enable();
 
