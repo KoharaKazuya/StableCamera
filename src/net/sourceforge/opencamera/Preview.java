@@ -99,6 +99,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	private final int PHASE_TIMER = 1;
 	private final int PHASE_TAKING_PHOTO = 2;
 	private final int PHASE_PREVIEW_PAUSED = 3; // the paused state after taking a photo
+	private final int PHASE_STABLE = 4; // 撮影ボタンを押してから"ぶれ"が収まって安定し、シャッターを切る前のフェーズ
 	private int phase = PHASE_NORMAL;
 	/*private boolean is_taking_photo = false;
 	private boolean is_taking_photo_on_timer = false;*/
@@ -218,6 +219,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
     private float [] gravity = new float[3];
     private boolean has_geomagnetic = false;
     private float [] geomagnetic = new float[3];
+    private float [] acceleration = new float[3];
     private float [] deviceRotation = new float[9];
     private float [] cameraRotation = new float[9];
     private float [] deviceInclination = new float[9];
@@ -3031,11 +3033,20 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		remaining_burst_photos = n_burst-1;
 		
 		if( timer_delay == 0 ) {
-			takePicture();
+			takePictureWhenStable();
 		}
 		else {
 			takePictureOnTimer(timer_delay, false);
 		}
+	}
+	
+	private void takePictureWhenStable() {
+		if (camera == null || this.phase != PHASE_NORMAL) {
+			Log.e(TAG, "cannot take picture");
+			return;
+		}
+		
+		this.phase = PHASE_STABLE;
 	}
 	
 	private void takePictureOnTimer(long timer_delay, boolean repeated) {
@@ -4165,6 +4176,22 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		this.invalidate();
+
+		// 重力を除いた加速度の取得
+        for(int i=0;i<3;i++) {
+            this.acceleration[i] = event.values[i] - gravity[i];
+        }
+        Log.d("Acceleration", "(" + acceleration[0] + ", " + acceleration[1] + ", " + acceleration[2] + ")");
+        // "ぶれ"の指標
+        float acc = acceleration[0]*acceleration[0] + acceleration[1]*acceleration[1] + acceleration[2]*acceleration[2];
+        Log.d("acc", String.valueOf(acc));
+        if( acc < 0.01 ) {
+    		if (camera != null && this.phase == PHASE_STABLE) {
+            	Log.d("Shutter", String.valueOf(acc));
+            	this.phase = PHASE_NORMAL;
+            	takePicture();
+    		}
+        }
 	}
 
     void onMagneticSensorChanged(SensorEvent event) {
