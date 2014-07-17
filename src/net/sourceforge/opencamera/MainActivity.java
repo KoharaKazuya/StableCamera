@@ -58,11 +58,13 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
@@ -72,7 +74,6 @@ class MyDebug {
 
 //メインアクティビティ
 public class MainActivity extends Activity {
-
 
 
 	private static final String TAG = "MainActivity";
@@ -85,6 +86,9 @@ public class MainActivity extends Activity {
 	private String mode = NORMAL;
 	private HashMap<String, Integer> modeImageIDPairs = null;
 
+	//プログレスバー
+	private static ProgressBar sensorProgress;
+
 	private int rotation = 0;
 
 	//センサマネージャー
@@ -92,7 +96,7 @@ public class MainActivity extends Activity {
 
 	//加速度センサ
 	private Sensor mSensorAccelerometer = null;
-	private SensorViewUpdater accelerometerSensor = null;
+	private SensorViewUpdater sensorViewUpdator = null;
 	private GyroSensorViewUpdater gyroSensor = null;
 
 	//磁気センサ
@@ -133,6 +137,12 @@ public class MainActivity extends Activity {
     	long time_s = System.currentTimeMillis();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		//キャンバスのレイアウト調整
+		ArrowCanvas arrowCanvas = (ArrowCanvas)findViewById(R.id.arrowCanvas);
+		arrowCanvas.initLayout();
+
+
 
 		//モードとそれに対応する画像IDのペアを保存
 		this.modeImageIDPairs = new HashMap<String, Integer>();
@@ -185,7 +195,7 @@ public class MainActivity extends Activity {
 				Log.d(TAG, "found accelerometer");
 			//加速度センサを取得
 			mSensorAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-			this.accelerometerSensor = new SensorViewUpdater(this);
+			this.sensorViewUpdator = new SensorViewUpdater(this);
 			this.gyroSensor = new GyroSensorViewUpdater(this);
 		}
 		else {
@@ -360,7 +370,7 @@ public class MainActivity extends Activity {
 	        getWindow().setAttributes(layout);
 		}
 
-		this.accelerometerSensor.setListener();
+
 		this.gyroSensor.setListener();
         mSensorManager.registerListener(accelerometerListener, mSensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(magneticListener, mSensorMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
@@ -401,6 +411,21 @@ public class MainActivity extends Activity {
 
 		preview.onResume();
 
+		//プログレスバーの設定
+		sensorProgress = (ProgressBar)findViewById(R.id.SensorBar);
+		sensorProgress.setMax(10);
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)sensorProgress.getLayoutParams();
+		layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+		sensorProgress.setLayoutParams(layoutParams);
+		sensorProgress.setRotation(90.0f);
+
+		TextView label = (TextView)findViewById(R.id.progressLabel);
+		label.setRotation(270.0f);
+		RelativeLayout.LayoutParams textlayoutParams = (RelativeLayout.LayoutParams)label.getLayoutParams();
+		textlayoutParams.addRule(RelativeLayout.BELOW, R.id.SensorBar);
+
+		//センサのイベントを登録
+		this.sensorViewUpdator.setListener();
     }
 
     @Override
@@ -409,7 +434,7 @@ public class MainActivity extends Activity {
 			Log.d(TAG, "onPause");
         super.onPause();
         //mSensorManager.unregisterListener(accelerometerListener);
-        this.accelerometerSensor.unsetListener();
+        this.sensorViewUpdator.unsetListener();
         this.gyroSensor.unsetListener();
         mSensorManager.unregisterListener(magneticListener);
         orientationEventListener.disable();
@@ -593,6 +618,8 @@ public class MainActivity extends Activity {
 
 			this.rotateSensorValues(ui_rotation);
 			//this.rotateModeSpinner();
+
+
 		}
 		else {
 			View view = findViewById(R.id.switch_camera);
@@ -1559,4 +1586,11 @@ public class MainActivity extends Activity {
 		ToastBoxer() {
 		}
 	}
+
+    //プログレスバーの値をセット
+    public static void setSensorValue(double progress) {
+    	sensorProgress.setProgress((int)progress);
+    }
+
+
 }

@@ -19,12 +19,31 @@
        android:prompt="@string/mode_normal"/>
 	-->
 
+	<ProgressBar
+	    android:id="@+id/SensorBar"
+	    android:layout_marginLeft="-220dp"
+	    android:layout_width="500dp"
+	    android:layout_height="10dp"
+	    android:indeterminate="false"
+		android:progressDrawable="@drawable/progressdesign"
+	    style="?android:attr/progressBarStyleHorizontal" />
+	<TextView
+	    android:id="@+id/progressLabel"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textSize="15sp"
+	    android:padding="2dp"
+	    android:background="@drawable/acceleratorbox"
+	    android:textColor="#FFFFFF"
+	    android:text="ブレ度"
+	    android:layout_marginLeft="23dp"/>
+
 	<ImageButton
         android:id="@+id/modeButton"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:padding="10dp"
-        android:layout_marginLeft="50dp"
+        android:layout_marginLeft="90dp"
         android:scaleType="fitCenter"
         android:contentDescription="Mode"
         android:src="@drawable/normal"/>
@@ -58,8 +77,7 @@
             android:lines="2"
             android:layout_margin="2dp"
             android:textColor="#FFFFFF"
-            android:background="@drawable/acceleratorbox"
-            android:text="5"/>
+            android:background="@drawable/acceleratorbox"/>
 
         <TextView
             android:id="@+id/acceleratorZ"
@@ -72,6 +90,7 @@
             android:textColor="#FFFFFF"
             android:background="@drawable/acceleratorbox"
             android:text="1"/>
+
 
         <!--
         <TextView
@@ -262,5 +281,10 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         />
+
+    <net.sourceforge.opencamera.ArrowCanvas
+	    android:id="@+id/arrowCanvas"
+	    android:layout_width="250dp"
+	    android:layout_height="250dp"/>
 
 </RelativeLayout>
