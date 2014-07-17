@@ -58,11 +58,13 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
@@ -84,6 +86,9 @@ public class MainActivity extends Activity {
 
 	private String mode = NORMAL;
 	private HashMap<String, Integer> modeImageIDPairs = null;
+
+	//プログレスバー
+	private static ProgressBar sensorProgress;
 
 	private int rotation = 0;
 
@@ -133,6 +138,20 @@ public class MainActivity extends Activity {
     	long time_s = System.currentTimeMillis();
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		//プログレスバーの設定
+		sensorProgress = (ProgressBar)findViewById(R.id.SensorBar);
+		sensorProgress.setMax(10);
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)sensorProgress.getLayoutParams();
+		layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+		sensorProgress.setLayoutParams(layoutParams);
+		sensorProgress.setRotation(90.0f);
+
+		TextView label = (TextView)findViewById(R.id.progressLabel);
+		label.setRotation(270.0f);
+		RelativeLayout.LayoutParams textlayoutParams = (RelativeLayout.LayoutParams)label.getLayoutParams();
+		textlayoutParams.addRule(RelativeLayout.BELOW, R.id.SensorBar);
+
 
 		//モードとそれに対応する画像IDのペアを保存
 		this.modeImageIDPairs = new HashMap<String, Integer>();
@@ -593,6 +612,8 @@ public class MainActivity extends Activity {
 
 			this.rotateSensorValues(ui_rotation);
 			//this.rotateModeSpinner();
+
+
 		}
 		else {
 			View view = findViewById(R.id.switch_camera);
@@ -1559,4 +1580,11 @@ public class MainActivity extends Activity {
 		ToastBoxer() {
 		}
 	}
+
+    //プログレスバーの値をセット
+    public static void setSensorValue(double progress) {
+    	sensorProgress.setProgress((int)progress);
+    }
+
+
 }

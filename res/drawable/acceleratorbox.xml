@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
 
-    <rectangle
-        android:layout_width="30px"
-        android:layout_height="30px"
-        android:color="#000000" >
-
-        <rectangle
-            android:layout_width="10px"
-            android:layout_height="30px"/>
-    </rectangle>
+    <solid android:color="#000000"/>
 
 </shape>
