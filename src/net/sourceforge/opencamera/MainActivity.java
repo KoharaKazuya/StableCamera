@@ -144,6 +144,20 @@ public class MainActivity extends Activity {
 
 
 
+		//プログレスバーの設定
+		sensorProgress = (ProgressBar)findViewById(R.id.SensorBar);
+		sensorProgress.setMax(10);
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)sensorProgress.getLayoutParams();
+		layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+		sensorProgress.setLayoutParams(layoutParams);
+		sensorProgress.setRotation(90.0f);
+
+		TextView label = (TextView)findViewById(R.id.progressLabel);
+		label.setRotation(270.0f);
+		RelativeLayout.LayoutParams textlayoutParams = (RelativeLayout.LayoutParams)label.getLayoutParams();
+		textlayoutParams.addRule(RelativeLayout.BELOW, R.id.SensorBar);
+
+
 		//モードとそれに対応する画像IDのペアを保存
 		this.modeImageIDPairs = new HashMap<String, Integer>();
 		this.modeImageIDPairs.put(NORMAL, R.drawable.normal);

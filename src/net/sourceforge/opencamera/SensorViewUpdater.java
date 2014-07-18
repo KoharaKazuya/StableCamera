@@ -41,6 +41,15 @@ public class SensorViewUpdater extends Accelerometer {
 		String yValue = "Y\r\n" + decimalFormat.format(y);
 		String zValue = "Z\r\n" + decimalFormat.format(z);
 
+		//ブレの指標
+		//と思ったけど制御しにくいので，単純に絶対値の合計
+		double deviation = Math.abs(x) + Math.abs(y) + Math.abs(z);
+		deviation *= 10.0;
+		if (deviation > 10.0) {
+			deviation = 10.0;
+		}
+		MainActivity.setSensorValue(deviation);
+
 		acceleratorX.setText(xValue);
 		acceleratorY.setText(yValue);
 		acceleratorZ.setText(zValue);
